@@ -34,6 +34,7 @@ elif env == 'mac':
 class Arm(object):
     def __init__(self, pinsTuple):
         self._pin1, self._pin2, self._pin3, self._pin4 = pinsTuple
+        log.debug("ARM mode: " + env)
         if env == 'pi':
             self._servo_base = AngularServo(self._pin1, min_angle=-80, max_angle = 80)
             self._servo_arm1 = AngularServo(self._pin2, min_angle=-80, max_angle = 80)

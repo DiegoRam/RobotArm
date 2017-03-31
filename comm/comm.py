@@ -90,7 +90,7 @@ class EchoWebSocket(tornado.websocket.WebSocketHandler):
         self.write_message(u"You said: " + message)
         log.debug(u"You said: " + message)
         #TODO logic about servo motors
-        self.ARM.base_pos(message)
+        self.ARM.base_pos(int(message))
 
     def on_close(self):
         log.debug("WebSocket closed")
@@ -100,7 +100,7 @@ class Client(object):
         self._host = host
         self._port = port
         log.debug("Establishing connection...")
-        self.ws = WebSocketApp("ws://localhost:9005/robotarm", on_close = on_close, on_message = on_message)
+        self.ws = WebSocketApp("ws://192.168.1.67:9005/robotarm", on_close = on_close, on_message = on_message)
         log.debug("Connection established...")
         self.ws.on_open = on_open
 

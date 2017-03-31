@@ -64,7 +64,7 @@ class Arm(object):
             self._servo_base.angle = angle
             sleep(0.2)
             self._servo_base.detach()
-        log.debug("Base servo moved to: " + angle)
+        log.debug("Base servo moved to: " + str(angle))
 
     def arm1_pos(self, angle):
         if env == 'pi':

@@ -91,7 +91,7 @@ class Ocula(object):
 
 		self._draw_on_image(frame,balls)
 		message = str(mapValue(balls[0].rect[0], 0,270, -100, 100)) + ',' + str(mapValue(balls[0].rect[1], 0,200, -100, 100))
-		self.client.send()
+		self.client.send(message)
 
 
     def run(self):

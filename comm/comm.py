@@ -58,7 +58,7 @@ class Arm(object):
             self._servo_claw.angle(angle)
             sleep(0.2)
             self._servo_claw.detach()
-        log.debug("Claw servo moved to: " + angle)
+        log.debug("Claw servo moved to: " + str(angle))
 
     def base_pos(self, angle):
         if env == 'pi':
@@ -72,14 +72,14 @@ class Arm(object):
             self._servo_arm1.angle = angle
             sleep(0.2)
             self._servo_arm1.detach()
-        log.debug("Arm1 servo moved to: " + angle)
+        log.debug("Arm1 servo moved to: " + str(angle))
 
     def arm2_pos(self, angle):
         if env == 'pi':
             self._servo_arm2.angle = angle
             sleep(0.2)
             self._servo_arm2.detach()
-        log.debug("Arm2 servo moved to: " + angle)
+        log.debug("Arm2 servo moved to: " + str(angle))
 
 
 class EchoWebSocket(tornado.websocket.WebSocketHandler):

@@ -88,11 +88,11 @@ class EchoWebSocket(tornado.websocket.WebSocketHandler):
         log.debug("WebSocket opened")
 
     def on_message(self, message):
-        self.write_message(u"You said: " + message)
-        log.debug(u"You said: " + message)
-        #TODO logic about servo motors
+		self.write_message(u"You said: " + message)
+		log.debug(u"You said: " + message)
+		#TODO logic about servo motors
 		h, v = message.split(',')
-        self.ARM.base_pos(int(v))
+		self.ARM.base_pos(int(v))
 		self.ARM.arm1_pos(int(v))
 
     def on_close(self):

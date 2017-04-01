@@ -38,6 +38,5 @@ def draw_circle(image, circle, color):
 	if circle is None:
 		return
 
-	x, y, r, c = circle
+	x, y, r = circle
 	cv2.circle(image, (int(x), int(y)), int(r), color, 4)
-	cv2.circle(image, c, 5, (0, 0, 255), -1)

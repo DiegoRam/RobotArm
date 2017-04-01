@@ -1,6 +1,6 @@
 import cv2
-from . import rects
-from . import utils
+import rects
+import utils
 import numpy as np
 
 
@@ -213,52 +213,40 @@ class TurnLeftTracker(Tracker):
 
 
 class CircleTracker(Tracker):
-	def __init__(self):
-		self._elementRectColor= (0,0,255)
-		self._elements = []
-
-	def _createElement(self):
-		return Circle()
+    def __init__(self):
+        self._elementRectColor= (0,0,255)
+        self._elements = []
 
 
-	def update(self, image):
-		self._elements = []
-		greenLower = np.array([29, 86, 6])
-		greenUpper = np.array([64, 255, 255])
-		blurred = cv2.GaussianBlur(image, (11, 11), 0)
-		hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    def _createElement(self):
+        return Circle()
 
-		mask = cv2.inRange(hsv, greenLower, greenUpper)
-		mask = cv2.erode(mask, None, iterations=2)
-		mask = cv2.dilate(mask, None, iterations=2)
 
-		cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-			cv2.CHAIN_APPROX_SIMPLE)[-2]
-		center = None
+    def update(self, image):
+        self._elements = []
+        gray =  cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        ##blurred = cv2.GaussianBlur(gray, (11, 11), 0)
+        #circles = cv2.HoughCircles(gray, cv2.cv.CV_HOUGH_GRADIENT, 1.2, 100)
+        circles = cv2.HoughCircles(gray, cv2.cv.CV_HOUGH_GRADIENT,1,10,param1=50,param2=30,minRadius=0,maxRadius=25)
+        if circles is not None:
+            circles = np.round(circles[0, :]).astype("int")
+            for (x, y, r) in circles:
+                element = self._createElement()
+                element.rect = (x, y, r)
+                self._elements.append(element)
 
-		if len(cnts) > 0:
-			c = max(cnts, key=cv2.contourArea)
-			((x, y), radius) = cv2.minEnclosingCircle(c)
-			M = cv2.moments(c)
-			center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
 
-			if radius > 10:
-				element = self._createElement()
-				element.rect = (x, y, radius, center)
-				self._elements.append(element)
+    def drawDebug(self, image):
+        if self._elementRectColor is None:
+            raise Exception("Element color for this tracker need to be set.")
 
-	def drawDebug(self, image):
-		if self._elementRectColor is None:
-			raise Exception("Element color for this tracker need to be set.")
+        if utils.isGray(image):
+            elementColor = 255
+        else:
+            elementColor = self._elementRectColor
 
-		if utils.isGray(image):
-			elementColor = 255
-
-		else:
-			elementColor = self._elementRectColor
-
-		for circle in self._elements:
-			rects.draw_circle(image, circle.rect, elementColor)
+        for circle in self._elements:
+            rects.draw_circle(image, circle.rect, elementColor)
 
 class TurnRightTracker(Tracker):
 	def __init__(self, scaleFactor = 1.2, minNeighbors = 2, \
@@ -276,7 +264,7 @@ class BallTracker(Tracker):
 		flags = cv2.cv.CV_HAAR_FIND_BIGGEST_OBJECT):
 		Tracker.__init__(self, scaleFactor = 1.2, minNeighbors = 2, \
 			flags = cv2.cv.CV_HAAR_FIND_BIGGEST_OBJECT)
-		self._classifier = cv2.CascadeClassifier("video/cascades/ball_cascade.xml")
+		self._classifier = cv2.CascadeClassifier("./tracker/ball_cascade.xml")
 		self._elementRectColor= (0,200,200)
 
 	def _createElement(self):

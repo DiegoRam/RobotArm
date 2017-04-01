@@ -3,14 +3,14 @@ from time import sleep
 import tornado
 import tornado.websocket
 import tornado.httpserver
-from websocket import WebSocketApp
+from websocket import WebSocketApp, create_connection
 
 
 config = configparser.ConfigParser()
-config.read('../conf/application.cfg')
+config.read('./conf/application.cfg')
 env = config.get("system","env")
 
-log = logging.getLogger("RobotArm")
+log = logging.getLogger("Arm")
 logger_level = config.get("system","logging.level")
 
 log.setLevel(logging.DEBUG)
@@ -36,10 +36,10 @@ class Arm(object):
         self._pin1, self._pin2, self._pin3, self._pin4 = pinsTuple
         log.debug("ARM mode: " + env)
         if env == 'pi':
-            self._servo_base = AngularServo(self._pin1, min_angle=-80, max_angle = 80)
-            self._servo_arm1 = AngularServo(self._pin2, min_angle=-80, max_angle = 80)
-            self._servo_arm2 = AngularServo(self._pin3, min_angle=-80, max_angle = 80)
-            self._servo_claw = AngularServo(self._pin4, min_angle=-80, max_angle = 80)
+            self._servo_base = AngularServo(self._pin1, min_angle=-100, max_angle = 100)
+            self._servo_arm1 = AngularServo(self._pin2, min_angle=-100, max_angle = 100)
+            self._servo_arm2 = AngularServo(self._pin3, min_angle=-100, max_angle = 100)
+            self._servo_claw = AngularServo(self._pin4, min_angle=-100, max_angle = 100)
 
     def center(self):
         if env == 'pi':
@@ -91,19 +91,22 @@ class EchoWebSocket(tornado.websocket.WebSocketHandler):
         self.write_message(u"You said: " + message)
         log.debug(u"You said: " + message)
         #TODO logic about servo motors
-        self.ARM.base_pos(int(message))
+		h, v = message.split(',')
+        self.ARM.base_pos(int(v))
+		self.ARM.arm1_pos(int(v))
 
     def on_close(self):
         log.debug("WebSocket closed")
 
 class Client(object):
     def __init__(self, host = "", port = 9005):
-        self._host = host
-        self._port = port
-        log.debug("Establishing connection...")
-        self.ws = WebSocketApp("ws://192.168.1.67:9005/robotarm", on_close = on_close, on_message = on_message)
-        log.debug("Connection established...")
-        self.ws.on_open = on_open
+		self._host = host
+		self._port = port
+		log.debug("Establishing connection...")
+		##self.ws = WebSocketApp("ws://192.168.1.67:9005/robotarm", on_close = on_close, on_message = on_message)
+		self.ws = create_connection("ws://192.168.1.67:9005/robotarm")
+		log.debug("Connection established...")
+		#self.ws.on_open = on_open
 
 
     def readCamera(self):
@@ -123,11 +126,15 @@ def on_close(ws):
     log.debug("Client closed...")
 
 def on_open(ws):
-    def run(*args):
+	log.debug('Client working....')
+	'''
+	def run(*args):
         while True:
             data = raw_input("Enter angle: ")
             ws.send(data)
     thread.start_new_thread(run,())
+	'''
+
 
 def main(argv):
     try:

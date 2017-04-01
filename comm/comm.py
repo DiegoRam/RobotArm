@@ -93,7 +93,7 @@ class EchoWebSocket(tornado.websocket.WebSocketHandler):
 		#TODO logic about servo motors
 		h, v = message.split(',')
 		self.ARM.base_pos(int(v))
-		self.ARM.arm1_pos(int(v))
+		#self.ARM.arm1_pos(int(v))
 
     def on_close(self):
         log.debug("WebSocket closed")
